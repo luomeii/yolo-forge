@@ -237,7 +237,7 @@ See [docs/profile_schema.md](docs/profile_schema.md) for full schema.
 
 ## Roadmap / 路线图
 
-### v0.2 (current / 当前) ✅
+### v0.1 (current / 当前) ✅
 - Monorepo: core / agent / desktop
 - PySide6 desktop app with dark IDE theme
 - 6 panels: Converter / Inspector / Reviewer / Trainer / Settings + Agent chat
@@ -245,13 +245,13 @@ See [docs/profile_schema.md](docs/profile_schema.md) for full schema.
 - Trainer (Ultralytics subprocess) + Inspector (deterministic)
 - 43 unit tests passing
 
-### v0.3 (next / 下一个)
+### v0.2 (next / 下一个)
 - 🔜 Inspector integration into Structure Agent (auto-scan → auto-profile → auto-convert)
 - 🔜 Training execution Agent (multi-step: convert → train → report)
 - 🔜 Dataset visualization (class distribution charts, box size heatmap)
 - 🔜 Plugin system for custom `label_format`
 
-### v0.4+
+### v0.3+
 - 🔜 Augmentation module
 - 🔜 Multi-dataset management
 - 🔜 Active learning loop (train → predict → suggest uncertain samples → review)
