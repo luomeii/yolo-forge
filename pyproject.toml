@@ -1,0 +1,110 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yolo-forge"
+version = "0.2.0"
+description = "Local-first Python-native YOLO dataset workstation: review, convert, train, analyze — unified in one PySide6 desktop app."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "yolo-forge contributors" },
+]
+requires-python = ">=3.9"
+keywords = [
+    "yolo",
+    "object-detection",
+    "annotation",
+    "dataset",
+    "computer-vision",
+    "opencv",
+    "ultralytics",
+    "pyside6",
+    "agent",
+    "llm",
+    "data-preparation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=1.20",
+    "opencv-python>=4.5",
+    "pyyaml>=6.0",
+    "pillow>=9.0",
+    "tqdm>=4.60",
+    "pydantic>=2.0",
+    "ultralytics>=8.0",
+]
+
+[project.optional-dependencies]
+# 桌面 GUI（PySide6）
+desktop = [
+    "PySide6>=6.5",
+]
+# LLM Agent 模块
+agent = [
+    "openai>=1.0",
+    "openai-agents>=0.0.10",
+]
+# 一键全装
+all = [
+    "PySide6>=6.5",
+    "openai>=1.0",
+    "openai-agents>=0.0.10",
+]
+# 数据集可视化
+viz = [
+    "matplotlib>=3.5",
+]
+# 开发用
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-qt>=4.0",
+    "ruff>=0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/luomeii/yolo-forge"
+Repository = "https://github.com/luomeii/yolo-forge"
+Issues = "https://github.com/luomeii/yolo-forge/issues"
+Documentation = "https://github.com/luomeii/yolo-forge#readme"
+
+[project.scripts]
+yolo-forge = "yolo_forge_core.cli:main"
+yolo-forge-desktop = "yolo_forge_desktop.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "yolo_forge_core*",
+    "yolo_forge_agent*",
+    "yolo_forge_desktop*",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
