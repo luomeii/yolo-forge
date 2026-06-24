@@ -1,0 +1,51 @@
+# Build / dist
+build/
+dist/
+*.egg-info/
+*.egg
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Dataset samples (don't commit real data)
+datasets/
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tif
+*.tiff
+*.webp
+!docs/**/*.png
+!examples/**/*.png
+
+# Output of review / convert runs
+output/
+satisfied/
+unsatisfied/
+yolo_forge_output/
+progress.json
+
+# LLM secrets
+.env
+.env.local
+*.key

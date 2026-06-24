@@ -1,0 +1,30 @@
+# Pascal VOC → YOLO 转换
+# Pascal VOC XML → YOLO format conversion
+#
+# 注意: VOC 是按类别名 (string) 匹配, 而不是 id.
+# Note: VOC matches by class name (string), not by id.
+# 你需要在 class_mappings 里用 source_name 指定 VOC XML 里的 <name> 值.
+
+name: voc_to_yolo
+description: Convert Pascal VOC XML annotations to YOLO format.
+
+output_dir: ./yolo_output
+classes: [dog, cat, person]      # 目标类别顺序 / target class order (id 0,1,2)
+
+train_split: 0.8
+val_split: 0.2
+test_split: 0.0
+
+sources:
+  - name: voc_main
+    path: ./VOCdevkit/VOC2012
+    images_subdir: JPEGImages
+    labels_subdir: Annotations
+    label_format: voc
+    label_ext: .xml
+    # VOC 按类别名匹配, source_name 必须和 XML 里的 <name> 一致
+    class_mappings:
+      - {source_name: dog,    target_id: 0}
+      - {source_name: cat,    target_id: 1}
+      - {source_name: person, target_id: 2}
+    background: skip           # VOC 通常没有纯背景图

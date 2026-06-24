@@ -1,0 +1,27 @@
+# 绝对像素坐标 → YOLO 归一化坐标
+# Absolute pixel coordinates → YOLO normalized coordinates
+#
+# 适用: 自己写的小工具输出 .txt 是 class_id x1 y1 x2 y2 (像素值).
+# Use case: a custom tool output .txt files with class_id x1 y1 x2 y2 (pixel values).
+# 引擎会用实际图片尺寸自动归一化.
+# The engine normalizes using actual image dimensions.
+
+name: raw_px_to_yolo
+description: Convert raw pixel-coord labels to normalized YOLO format.
+
+output_dir: ./yolo_output
+classes: [object]
+
+train_split: 0.8
+val_split: 0.2
+test_split: 0.0
+
+sources:
+  - name: main
+    path: ./raw_dataset
+    images_subdir: images
+    labels_subdir: labels
+    label_format: raw_px
+    label_ext: .txt
+    class_mappings: []          # 空 = source_id == target_id
+    background: include

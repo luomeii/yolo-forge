@@ -1,0 +1,26 @@
+# 单文件夹 YOLO 数据集 → 标准化切分
+# Single-folder YOLO dataset → standardized train/val split
+#
+# 适用场景: 你已经有一个 YOLO 数据集, 但还没有 train/val 切分.
+# Use case: you already have a YOLO dataset but no train/val split.
+
+name: single_folder_split
+description: Take a single YOLO folder and split it into train/val.
+
+output_dir: ./yolo_output
+classes: [object]
+
+train_split: 0.8
+val_split: 0.2
+test_split: 0.0
+seed: 42
+
+sources:
+  - name: main
+    path: ./my_dataset
+    images_subdir: images
+    labels_subdir: labels
+    label_format: yolo
+    label_ext: .txt
+    class_mappings: []           # 空 = source_id == target_id
+    background: include

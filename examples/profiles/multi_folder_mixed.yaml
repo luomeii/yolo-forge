@@ -1,0 +1,81 @@
+# ──────────────────────────────────────────────────────────────
+# 多文件夹混合数据集 → 干净 YOLO 输出
+# Multi-folder mixed dataset → unified YOLO output
+# ──────────────────────────────────────────────────────────────
+# 这是 yolo-forge 的旗舰示例, 对应"老师发来的奇形怪状数据集":
+# This is the flagship example for yolo-forge, handling messy real-world datasets:
+#
+#   datasets/
+#   ├── face/       (1,896 imgs, only id=0)
+#   ├── line/       (3,039 imgs, id=0 + id=1)
+#   ├── syn/        (1,200 imgs, id=0 + id=1)
+#   ├── oil/        (433 imgs, no labels — defect-free)
+#   ├── no_defect/  (343 imgs, no labels — defect-free)
+#   └── background/ (582 imgs, no labels — irrelevant backgrounds)
+#
+# 目标: 把 6 个文件夹统一成一个 YOLO 训练目录, 自动 train/val 切分.
+# Goal: unify 6 folders into one YOLO training directory with auto train/val split.
+
+name: defect_detection
+description: |
+  Industrial defect dataset merging 6 heterogeneous sub-folders
+  (annotated + background) into a single YOLO layout.
+
+output_dir: ./yolo_output
+classes: [pit, scratch]            # 目标类别 / target classes (id 0,1)
+
+# 切分 / splitting
+train_split: 0.85
+val_split: 0.15
+test_split: 0.0
+seed: 42
+
+# 复制策略: copy | symlink | move
+copy_strategy: copy
+flatten: true
+
+sources:
+  # ─── 有标注的源 / annotated sources ───
+  - name: face
+    path: D:/datasets/face
+    images_subdir: images
+    labels_subdir: labels
+    label_format: yolo
+    label_ext: .txt
+    # face 只有 id=0, 它的 id=0 是"黑点凹陷/裂纹", 统一映射到 pit
+    class_mappings:
+      - {source_id: 0, target_id: 0}     # face.id=0 → pit
+    background: include                  # 空标签图也保留作负样本
+
+  - name: line
+    path: D:/datasets/line
+    label_format: yolo
+    # line 的 id=0(油污黑块)→pit, id=1(划痕)→scratch
+    class_mappings:
+      - {source_id: 0, target_id: 0}
+      - {source_id: 1, target_id: 1}
+    background: include
+
+  - name: syn
+    path: D:/datasets/syn
+    label_format: yolo
+    class_mappings:
+      - {source_id: 0, target_id: 0}
+      - {source_id: 1, target_id: 1}
+    background: include
+
+  # ─── 纯背景源 / background-only sources ───
+  - name: oil
+    path: D:/datasets/oil
+    label_format: none                  # 无标签 / no labels
+    background: include                 # 保留作负样本, 生成空 .txt
+
+  - name: no_defect
+    path: D:/datasets/no_defect
+    label_format: none
+    background: include
+
+  - name: background
+    path: D:/datasets/background
+    label_format: none
+    background: skip                    # 太杂乱, 跳过 / too noisy, skip
