@@ -1,0 +1,440 @@
+/**
+ * YOLO-Forge SP — Floral Notepaper Theme (花笺主题)
+ *
+ * Inspired by: floral-notepaper project
+ * Style: 浅绿淡雅、生机繁美、低饱和度、毛玻璃质感
+ *
+ * Color palette:
+ *   - Primary green: #7CB342 (生机绿)
+ *   - Light green: #E8F5E9 (浅叶绿背景)
+ *   - Medium green: #C8E6C9 (中绿)
+ *   - Accent: #558B2F (深绿强调)
+ *   - Background: #F9FBF7 (米白偏绿)
+ *   - Surface: #FFFFFF (纯白卡片)
+ *   - Text: #2E3B2F (深绿灰文字)
+ *   - Text secondary: #5C6B5E
+ *   - Text tertiary: #8A9B8C
+ *   - Border: #D7E4D9
+ */
+
+@import "tailwindcss";
+
+:root {
+  /* ─── Color System — Floral Green ─── */
+  --bg-primary: #F9FBF7;
+  --bg-secondary: #F0F5EE;
+  --bg-tertiary: #E8F0E5;
+  --bg-elevated: #FFFFFF;
+  --bg-hover: #EDF3EA;
+  --bg-active: #DDE9D9;
+
+  --text-primary: #2E3B2F;
+  --text-secondary: #5C6B5E;
+  --text-tertiary: #8A9B8C;
+  --text-inverse: #FFFFFF;
+
+  --accent-primary: #7CB342;
+  --accent-hover: #8BC34A;
+  --accent-muted: rgba(124, 179, 66, 0.12);
+  --accent-deep: #558B2F;
+
+  --border-primary: #D7E4D9;
+  --border-secondary: #C8D8CA;
+  --border-focus: #7CB342;
+
+  --success: #66BB6A;
+  --warning: #FFA726;
+  --error: #EF5350;
+  --info: #42A5F5;
+
+  /* ─── Spacing ─── */
+  --sidebar-width: 72px;
+  --chat-width: 420px;
+  --header-height: 48px;
+  --statusbar-height: 28px;
+
+  /* ─── Typography ─── */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, monospace;
+
+  /* ─── Shadows — soft and organic ─── */
+  --shadow-sm: 0 1px 3px rgba(46, 59, 47, 0.05);
+  --shadow-md: 0 2px 8px rgba(46, 59, 47, 0.08);
+  --shadow-lg: 0 4px 16px rgba(46, 59, 47, 0.10);
+  --shadow-xl: 0 8px 32px rgba(46, 59, 47, 0.12);
+  --shadow-green: 0 4px 12px rgba(124, 179, 66, 0.15);
+  --shadow-gold: 0 2px 8px rgba(193, 168, 100, 0.12);
+
+  /* ─── Radius ─── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar — slim and green ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: var(--accent-muted);
+  color: var(--text-primary);
+}
+
+/* ─── Focus ─── */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+/* ─── Code blocks ─── */
+pre, code {
+  font-family: var(--font-mono);
+}
+
+pre {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+code {
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* ─── Animations ─── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* ─── Glass effect for elevated surfaces ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(215, 228, 217, 0.5);
+}
+
+/* ─── Floral pattern background — layered green texture ─── */
+.floral-bg {
+  background-color: var(--bg-primary);
+  background-image:
+    /* Large soft blooms */
+    radial-gradient(ellipse at 15% 85%, rgba(124, 179, 66, 0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 15%, rgba(85, 139, 47, 0.04) 0%, transparent 40%),
+    /* Medium green pools */
+    radial-gradient(circle at 40% 50%, rgba(232, 245, 233, 0.6) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(200, 230, 201, 0.4) 0%, transparent 35%),
+    /* Small accent dots */
+    radial-gradient(circle at 25% 25%, rgba(124, 179, 66, 0.03) 0%, transparent 15%),
+    radial-gradient(circle at 75% 60%, rgba(85, 139, 47, 0.02) 0%, transparent 15%);
+}
+
+/* ─── Gold silk texture (金丝楠木) — subtle golden gradient lines ─── */
+.gold-silk-bg {
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      transparent,
+      transparent 40px,
+      rgba(193, 168, 100, 0.015) 40px,
+      rgba(193, 168, 100, 0.015) 41px,
+      transparent 41px,
+      transparent 80px,
+      rgba(193, 168, 100, 0.01) 80px,
+      rgba(193, 168, 100, 0.01) 81px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 60px,
+      rgba(124, 179, 66, 0.02) 60px,
+      rgba(124, 179, 66, 0.02) 61px
+    );
+}
+
+/* ─── Herbal vine border (草本纹边框) ─── */
+.herbal-border {
+  position: relative;
+}
+
+.herbal-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(124, 179, 66, 0.2) 0%,
+    rgba(193, 168, 100, 0.15) 25%,
+    rgba(85, 139, 47, 0.1) 50%,
+    rgba(193, 168, 100, 0.15) 75%,
+    rgba(124, 179, 66, 0.2) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ─── Gold-pressed corner ornament (石金蚀金角纹) ─── */
+.gold-corner {
+  position: relative;
+}
+
+.gold-corner::before,
+.gold-corner::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+}
+
+.gold-corner::before {
+  top: 0;
+  left: 0;
+  border-top: 1px solid rgba(193, 168, 100, 0.3);
+  border-left: 1px solid rgba(193, 168, 100, 0.3);
+  border-top-left-radius: var(--radius-md);
+  background: radial-gradient(circle at top left, rgba(193, 168, 100, 0.05), transparent 60%);
+}
+
+.gold-corner::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1px solid rgba(193, 168, 100, 0.3);
+  border-right: 1px solid rgba(193, 168, 100, 0.3);
+  border-bottom-right-radius: var(--radius-md);
+  background: radial-gradient(circle at bottom right, rgba(193, 168, 100, 0.05), transparent 60%);
+}
+
+/* ─── Decorative corner ornament ─── */
+.corner-ornament::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 8px;
+  width: 24px; height: 24px;
+  border-top: 1px solid var(--accent-muted);
+  border-left: 1px solid var(--accent-muted);
+  border-top-left-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.corner-ornament::after {
+  content: '';
+  position: absolute;
+  bottom: 8px; right: 8px;
+  width: 24px; height: 24px;
+  border-bottom: 1px solid var(--accent-muted);
+  border-right: 1px solid var(--accent-muted);
+  border-bottom-right-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* ─── Resizable divider ─── */
+.resizable-divider {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.resizable-divider:hover,
+.resizable-divider.dragging {
+  background: var(--accent-primary);
+}
+
+.resizable-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 32px;
+  background: var(--border-secondary);
+  border-radius: 1px;
+  transition: background 0.2s ease;
+}
+
+.resizable-divider:hover::after,
+.resizable-divider.dragging::after {
+  background: var(--accent-primary);
+}
+
+/* ─── Card with soft shadow and ornamental border ─── */
+.floral-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.floral-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-muted), transparent);
+}
+
+/* ─── Subtle leaf pattern for empty states ─── */
+.leaf-decoration {
+  position: absolute;
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ─── Button styles ─── */
+.btn-primary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(124, 179, 66, 0.2);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 8px rgba(124, 179, 66, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: var(--bg-active);
+  color: var(--text-tertiary);
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Input styles ─── */
+.input-floral {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-floral:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+/* ─── Label styles ─── */
+.label-floral {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
