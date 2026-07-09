@@ -1,267 +1,163 @@
-# 🔨 yolo-forge
+# YOLO-Forge SP
 
-**Local-first Python-native YOLO dataset workstation: review, convert, train, analyze — unified in one PySide6 desktop app.**
+> 智能YOLO数据集工作站 — 基于Codex/Claude Code架构模式的完全重构版本
 
-**本地优先、Python 原生的 YOLO 数据集工作站：审查 / 转换 / 训练 / 分析，统一在一个 PySide6 桌面应用里。**
+[![Version](https://img.shields.io/badge/version-3.0.0-7CB342.svg)]()
+[![License](https://img.shields.io/badge/license-MIT-7CB342.svg)]()
+[![Electron](https://img.shields.io/badge/Electron-35-7CB342.svg)]()
+[![React](https://img.shields.io/badge/React-19-7CB342.svg)]()
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![Version: 0.2.0](https://img.shields.io/badge/version-0.2.0-orange.svg)]()
+## 概述
 
-> **核心原则**: 重复性劳动用确定性引擎完成, 创造性判断用 LLM Agent 辅助. **Agent 只生成配置和报告, 绝不直接修改数据.**
->
-> **Core principle**: Deterministic engines handle repetitive work; LLM agents help with creative judgment. **Agents only generate configs and reports, never directly modify data.**
+YOLO-Forge SP 是一个基于 Electron + React + TypeScript + Python Worker 的智能 YOLO 数据集工作站。采用 Codex CLI 和 Claude Code 的架构模式，提供完整的 Agent 循环、工具系统、权限管理和上下文压缩。
 
----
+### 核心特性
 
-## Architecture / 架构
+- **智能体系统** — 支持 OpenAI 和 Anthropic SDK，流式输出，多轮工具调用
+- **权限管理** — Codex式3选项（本次允许/始终允许/拒绝），安全命令白名单
+- **上下文管理** — 五策略压缩（Snip/Microcompact/Autocompact/Collapse/Reactive）
+- **数据集检测** — 自动扫描目录结构，识别 YOLO/VOC/COCO/raw_px 格式
+- **格式转换** — 多格式互转，YAML Profile 声明式配置，dry-run 预览
+- **模型训练** — 基于 Ultralytics，完整参数配置，实时进度同步
+- **标签审查** — Canvas 可视化标注，补框/删除/撤销，自动保存
+- **任务管理** — 训练任务可视化，实时进度/日志，系统通知
+
+## 技术栈
+
+| 层级 | 技术 | 说明 |
+|------|------|------|
+| 桌面框架 | Electron 35 | 跨平台桌面应用 |
+| 前端框架 | React 19 | 渲染进程 UI |
+| 状态管理 | Zustand 5 | 轻量级全局状态 |
+| 构建工具 | Vite 6 | 快速 HMR 开发 |
+| LLM SDK | OpenAI SDK + Anthropic SDK | 双 Provider 支持 |
+| YOLO计算 | Python Worker (Ultralytics) | 子进程 NDJSON 通信 |
+| 样式 | CSS Variables | 花笺主题（浅绿淡雅） |
+
+## 架构
 
 ```
-yolo-forge/
-├── yolo_forge_core/         # 纯 Python 核心库, 无 GUI 依赖
-│   ├── converter/           #   数据集转换引擎 (YAML profile 驱动) ✅
-│   ├── reviewer/            #   标签审查 GUI (OpenCV) ✅
-│   ├── trainer.py           #   训练封装 (薄包 Ultralytics) ✅
-│   ├── inspector.py         #   确定性数据集探查 ✅
-│   └── utils.py             #   共享工具
-│
-├── yolo_forge_agent/        # LLM Agent 模块 (依赖 core)
-│   ├── config.py            #   ~/.yolo-forge/config.yaml 读写 ✅
-│   ├── llm_client.py        #   OpenAI 兼容客户端 ✅
-│   ├── base.py              #   Agent 基类 ✅
-│   ├── structure_agent.py   #   结构探查 Agent ✅
-│   └── report_agent.py      #   训练报告 Agent ✅
-│
-├── yolo_forge_desktop/      # PySide6 桌面 GUI (依赖 core + agent)
-│   ├── main_window.py       #   类 Codex 三栏布局 ✅
-│   ├── panels/              #   6 个功能面板 ✅
-│   ├── theme.py             #   暗色 IDE 主题 ✅
-│   └── app.py               #   入口 ✅
-│
-├── examples/profiles/       # 5 个内置 YAML 模板
-├── tests/                   # 43 个单元测试
-└── docs/                    # 文档
+┌─────────────────────────────────────────────┐
+│              Electron Main Process            │
+│  ┌─────────────────────────────────────────┐ │
+│  │       Agent Orchestrator (核心)          │ │
+│  │  ┌─────────────────────────────────────┐ │ │
+│  │  │  ReAct Loop (async generator ×7)    │ │ │
+│  │  │  ┌──────────┬───────────────────┐   │ │ │
+│  │  │  │ LLM Call │ Tool Execution    │   │ │ │
+│  │  │  └──────────┴───────────────────┘   │ │ │
+│  │  └─────────────────────────────────────┘ │ │
+│  │  ┌──────────┬──────────┬──────────────┐  │ │
+│  │  │ OpenAI   │Anthropic │ Context Mgr  │  │ │
+│  │  │ Provider │ Provider │ (5 strategies)│  │ │
+│  │  └──────────┴──────────┴──────────────┘  │ │
+│  │  ┌─────────────────────────────────────┐ │ │
+│  │  │  Tool Registry (9 tools)           │ │ │
+│  │  │  Permission Manager (Codex-style)  │ │ │
+│  │  └─────────────────────────────────────┘ │ │
+│  └─────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────┐ │
+│  │  Python Worker (subprocess, NDJSON IPC) │ │
+│  │  inspect | convert | train | report     │ │
+│  └─────────────────────────────────────────┘ │
+├─────────────────────────────────────────────┤
+│           IPC Bridge (contextBridge)          │
+├─────────────────────────────────────────────┤
+│            Renderer Process (React)           │
+│  ┌──────┬──────────────────┬──────────────┐ │
+│  │ Side │   Main Panel     │  Agent Chat  │ │
+│  │ bar  │ Inspector/Conv/  │  (streaming) │ │
+│  │ 72px │ Trainer/Reviewer │  420px       │ │
+│  │      │ Tasks/Settings   │              │ │
+│  └──────┴──────────────────┴──────────────┘ │
+└─────────────────────────────────────────────┘
 ```
 
-**模块依赖关系 (高内聚低耦合)**:
+## 项目结构
+
 ```
-desktop  →  agent  →  core  →  (numpy/opencv/ultralytics/pyyaml)
-   ↑          ↑
-   └──────────┴─  共享 config.yaml
+yolo-forge-sp/
+├── electron/                    # Electron 主进程
+│   ├── main.ts                  # 入口
+│   ├── preload.ts               # 安全 IPC 桥接
+│   ├── store.ts                 # JSON 持久化配置
+│   ├── agent/                   # Agent 核心系统
+│   │   ├── orchestrator.ts      # Agent 编排器
+│   │   ├── providers/           # LLM Provider (OpenAI/Anthropic)
+│   │   ├── tools/               # 9个工具
+│   │   ├── permissions/         # Codex式权限管理
+│   │   ├── context/             # 五策略上下文压缩
+│   │   └── loop/                # 会话管理
+│   ├── ipc/handlers.ts          # IPC 处理器
+│   ├── workers/python-manager.ts # Python 子进程管理
+│   └── python/worker.py         # YOLO 计算 Worker
+├── src/                         # React 渲染进程
+│   ├── components/
+│   │   ├── layout/              # 布局组件
+│   │   ├── chat/                # Agent 聊天
+│   │   └── panels/              # 功能面板
+│   ├── stores/app-store.ts      # Zustand 状态
+│   ├── i18n/index.ts            # 中英文国际化
+│   └── styles/globals.css       # 花笺主题
+└── package.json
 ```
 
----
+## 快速开始
 
-## Why? / 解决什么问题
+### 环境要求
 
-If you do YOLO object detection, you've probably hit these pain points:
+- Node.js 20+
+- Python 3.9+ (conda 推荐)
+- CUDA GPU (可选，训练用)
 
-1. **Auto-labeling produces 90% correct boxes, but reviewing them is painful.** LabelImg is dead, CVAT is too heavy for solo use.
-2. **Real-world datasets come in weird shapes.** Your advisor hands you 6 folders with mixed label formats, different class id conventions, and "background" folders. You write a one-off conversion script every time.
-3. **No unified toolchain.** You jump between LabelImg (review), custom scripts (convert), terminal (train), and Jupyter (analyze). Each step is a context switch.
-
-`yolo-forge` solves all three in one local app:
-
-- **Reviewer** — OpenCV canvas embedded in Qt, review/patch/delete/move boxes, archive satisfied/unsatisfied.
-- **Converter** — Declarative YAML profile converts heterogeneous datasets to clean YOLO layout.
-- **Inspector** — Deterministic structure scanner (no LLM), generates report + LLM prompt.
-- **Trainer** — Thin wrapper over Ultralytics, runs in subprocess, real-time progress.
-- **Agent** — LLM agents for structure inference and training report (with graceful fallback).
-- **Unified** — All in one PySide6 window, dark IDE theme.
-
-如果你做 YOLO 检测, 这三个痛点你应该都熟:
-
-1. **自动标注 90% 准, 但 review 起来很痛苦.** LabelImg 停更, CVAT 单人用太重.
-2. **真实数据集结构千奇百怪.** 老师丢给你 6 个文件夹, 标签格式不统一, class id 含义不一致, 还有几个"纯背景"文件夹.
-3. **没有统一工具链.** 在 LabelImg (审查) / 自写脚本 (转换) / 终端 (训练) / Jupyter (分析) 之间反复横跳.
-
-`yolo-forge` 一次解决:
-
-- **Reviewer** — OpenCV 画布嵌入 Qt, 审查/补标/删除/拖动框, 满意/不满意归档
-- **Converter** — 声明式 YAML profile, 一键转换异构数据集
-- **Inspector** — 确定性结构扫描 (不调 LLM), 生成报告 + LLM prompt
-- **Trainer** — Ultralytics 薄封装, 子进程跑, 实时进度
-- **Agent** — LLM 智能体 (结构推断 + 训练报告), 失败时优雅降级
-- **统一** — 一个 PySide6 窗口, 暗色 IDE 主题
-
----
-
-## Install / 安装
+### 安装
 
 ```bash
-# 完整安装 (core + agent + desktop)
-pip install "yolo-forge[all]"
+# 1. 安装 Node.js 依赖
+npm install
 
-# 或按需安装
-pip install yolo-forge                    # 仅 core
-pip install "yolo-forge[desktop]"         # + GUI
-pip install "yolo-forge[agent]"           # + LLM agent
+# 2. 安装 Python 依赖
+pip install -r electron/python/requirements.txt
+
+# 3. 启动开发模式
+npm run electron:dev
 ```
 
-**Dependencies**:
-- Core: `numpy`, `opencv-python`, `pyyaml`, `pillow`, `tqdm`, `pydantic`, `ultralytics`
-- Desktop: `PySide6>=6.5`
-- Agent: `openai>=1.0`
+### 配置
 
----
+1. 启动应用后进入 Settings 面板
+2. 选择 Provider (OpenAI / Anthropic)
+3. 输入 API Key
+4. 选择模型（可从 API 动态获取模型列表）
+5. 保存
 
-## Quick Start / 快速上手
+### 使用
 
-### Launch the desktop app / 启动桌面应用
+- **Agent Chat**: 右侧聊天面板，自然语言交互
+- **Inspector**: 扫描数据集结构
+- **Converter**: 格式转换
+- **Trainer**: 模型训练（自动扫描 conda 环境/GPU）
+- **Reviewer**: 标签可视化审查
+- **Tasks**: 训练任务管理
 
-```bash
-yolo-forge-desktop
-```
+## 设计理念
 
-A window like VS Code / Cursor opens with three panels:
-- **Left**: Navigation (Converter / Inspector / Reviewer / Trainer / Settings)
-- **Center**: Main workspace (switches by left selection)
-- **Right**: Agent chat panel (with LLM when configured)
+### 花笺主题
 
-打开后是一个类 VS Code / Cursor 的三栏窗口:
-- **左栏**: 功能导航 (Converter / Inspector / Reviewer / Trainer / Settings)
-- **中栏**: 主工作区 (根据左栏切换)
-- **右栏**: Agent 对话面板
+界面设计灵感来自[花笺项目](https://github.com/Achilng/floral-notepaper)，采用浅绿淡雅的色调，营造生机勃勃但不失沉稳的工作环境：
 
-### 1. Configure LLM / 配置 LLM
+- **主色调**: 浅绿 `#7CB342`，象征生机
+- **背景**: 米白偏绿 `#F9FBF7`，柔和护眼
+- **文字**: 深绿灰 `#2E3B2F`，清晰易读
+- **质感**: 毛玻璃 + 轻阴影，层次分明
 
-Switch to **Settings** panel, fill in:
-- API Key (e.g. `sk-...`)
-- Base URL (e.g. `https://api.openai.com/v1` or `https://api.deepseek.com/v1`)
-- Model (e.g. `gpt-4o-mini` / `deepseek-chat` / `glm-4-flash`)
+### 对标 Codex / Claude Code
 
-Click **Test Connection** to verify, then **Save**.
+- **Agent 循环**: 7 yield 点的异步生成器状态机
+- **权限系统**: 默认拒绝 + 3选项 + 安全命令白名单
+- **上下文管理**: 5 策略压缩，自动触发
+- **工具系统**: 9 个工具，风险分级，权限控制
 
-Config is stored at `~/.yolo-forge/config.yaml` (chmod 600).
+## License
 
-### 2. Convert a messy dataset / 转换杂乱数据集
-
-Two ways:
-
-**A) Use Agent** (right panel): type `分析 /path/to/dataset`. Agent scans structure, generates a profile YAML draft. Review it, then run.
-
-**B) Manual**: Switch to **Converter** panel, pick a YAML profile (or template), click **Run Conversion**.
-
-See [`examples/profiles/multi_folder_mixed.yaml`](examples/profiles/multi_folder_mixed.yaml) for the "advisor's 6-folder mixed dataset" case.
-
-### 3. Review labels / 审查标签
-
-**Reviewer** panel → fill image/label dirs → **Start Reviewing**.
-
-OpenCV canvas is embedded in Qt. Use keyboard shortcuts:
-- `j`/`l` prev/next, `k` satisfied, `d` unsatisfied, `a` enter draw mode
-- `0-9` `[` `]` switch class, `n` new class, `Backspace` delete
-- Click box to select, drag to move, right-click to deselect
-- Scroll = zoom, middle-drag = pan, `f` = fit screen
-
-### 4. Train / 训练
-
-**Trainer** panel → fill data.yaml + hyperparams → **Start Training**.
-
-Training runs in subprocess; logs stream in real-time. When done, click **Generate Report** to let the Report Agent analyze results.
-
-### 5. CLI (without GUI) / 命令行用法
-
-```bash
-# Inspect dataset structure (deterministic, no LLM)
-yolo-forge inspect /path/to/dataset --markdown
-
-# Convert
-yolo-forge convert --profile my_profile.yaml
-
-# Train (subprocess)
-yolo-forge train --data data.yaml --model yolo11n.pt --epochs 100
-
-# Launch reviewer (standalone OpenCV window)
-yolo-forge review --images ./images --labels ./labels --classes pit,car
-
-# List builtin profile templates
-yolo-forge templates --list
-```
-
----
-
-## Supported source formats / 支持的源格式
-
-| Format | Description | Class matching |
-|---|---|---|
-| `yolo` | `class_id cx cy w h` (normalized) | by `source_id` |
-| `raw_px` | `class_id x1 y1 x2 y2` (pixel) | by `source_id` |
-| `voc` | Pascal VOC XML | by `source_name` (string) |
-| `coco` | COCO instances.json | by `source_name` (string) |
-| `none` | no labels (background only) | n/a |
-
-Background handling: `include` (default) / `skip` / `copy_no_label` / `dedicated_folder`.
-
-See [docs/profile_schema.md](docs/profile_schema.md) for full schema.
-
----
-
-## LLM Agent design / LLM Agent 设计
-
-**Two agents in v0.2**:
-
-1. **Structure Agent** — Drop a folder path → agent scans (deterministic `inspect_dataset`) → LLM infers `class_mappings` / `background` strategy → outputs profile YAML draft → **user confirms** → converter engine executes.
-2. **Report Agent** — Point at training output dir → agent parses `results.csv` → LLM writes markdown analysis (overall performance, per-class weakness, training curve observations, improvement suggestions).
-
-**Security boundary / 安全边界**:
-- Agents ONLY generate configs (YAML) and reports (markdown)
-- All actual data operations go through tested deterministic engines
-- LLM failure triggers graceful fallback to deterministic mode
-- 用户始终在循环中 (human-in-the-loop) — profile 草稿必须人工确认才执行
-
-**Why OpenAI-compatible API only / 为什么只支持 OpenAI 兼容 API**:
-- One client implementation, broad compatibility
-- Works with: OpenAI / DeepSeek / 智谱 GLM / 通义千问 / Moonshot / Ollama / vLLM / One-API
-- If you want Claude, run it through an OpenAI-compatible proxy (LiteLLM / One-API)
-
----
-
-## Tech stack / 技术栈
-
-| Layer | Choice | Reason |
-|---|---|---|
-| Core lib | Python 3.9+ / Pydantic / PyYAML | Type-safe, minimal deps |
-| GUI | PySide6 (Qt6 LGPL) | Python-native, embeds OpenCV, no separate backend |
-| CV | OpenCV + Ultralytics | Industry standard |
-| Agent | OpenAI Python SDK | Mature, broad provider support |
-| Training | Ultralytics native API | Not reinventing the wheel |
-| Config | Single `~/.yolo-forge/config.yaml` | Simple, debuggable |
-
-**Monorepo, three modules, one `pip install`**. Each module has clean boundaries:
-- `yolo_forge_core` has zero GUI / LLM deps
-- `yolo_forge_agent` depends on core only
-- `yolo_forge_desktop` depends on both, adds Qt
-
----
-
-## Roadmap / 路线图
-
-### v0.1 (current / 当前) ✅
-- Monorepo: core / agent / desktop
-- PySide6 desktop app with dark IDE theme
-- 6 panels: Converter / Inspector / Reviewer / Trainer / Settings + Agent chat
-- Structure Agent + Report Agent with fallback
-- Trainer (Ultralytics subprocess) + Inspector (deterministic)
-- 43 unit tests passing
-
-### v0.2 (next / 下一个)
-- 🔜 Inspector integration into Structure Agent (auto-scan → auto-profile → auto-convert)
-- 🔜 Training execution Agent (multi-step: convert → train → report)
-- 🔜 Dataset visualization (class distribution charts, box size heatmap)
-- 🔜 Plugin system for custom `label_format`
-
-### v0.3+
-- 🔜 Augmentation module
-- 🔜 Multi-dataset management
-- 🔜 Active learning loop (train → predict → suggest uncertain samples → review)
-
----
-
-## Contributing / 贡献
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). PRs welcome — especially new profile templates, label format support, and theme variants.
-
-## License / 许可
-
-[MIT](LICENSE)
+MIT
